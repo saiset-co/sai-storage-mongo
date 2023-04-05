@@ -1,0 +1,8 @@
+version: '3'
+services:
+  sai-storage:
+    build:
+      context: ./saiStorageMongo
+      dockerfile: Dockerfile
+    ports:
+      - "8818:8818"
