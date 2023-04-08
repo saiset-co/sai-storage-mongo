@@ -5,4 +5,4 @@ services:
       context: ./saiStorageMongo
       dockerfile: Dockerfile
     ports:
-      - "8818:8818"
+      - "8801:8801"
