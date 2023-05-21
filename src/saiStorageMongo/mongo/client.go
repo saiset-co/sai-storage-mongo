@@ -104,7 +104,7 @@ func (c Client) FindOne(collectionName string, selector map[string]interface{}) 
 	return result, nil
 }
 
-func (c Client) Find(collectionName string, selector map[string]interface{}, inputOptions Options) (*FindResult, error) {
+func (c Client) Find(collectionName string, selector map[string]interface{}, inputOptions Options, includeFields []string) (*FindResult, error) {
 	findResult := &FindResult{}
 	requestOptions := options.Find()
 
@@ -130,6 +130,14 @@ func (c Client) Find(collectionName string, selector map[string]interface{}, inp
 
 	if inputOptions.Limit != 0 {
 		requestOptions.SetLimit(inputOptions.Limit)
+	}
+
+	if includeFields != nil {
+		projection := bson.D{}
+		for _, v := range includeFields {
+			projection = append(projection, bson.E{v, 1})
+		}
+		requestOptions.SetProjection(projection)
 	}
 
 	collection := c.GetCollection(collectionName)

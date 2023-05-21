@@ -17,10 +17,11 @@ func (s Server) handleWebSocketRequest(msg []byte) {
 }
 
 type jsonRequestType struct {
-	Collection string        `json:"collection"`
-	Select     bson.M        `json:"select,omitempty"`
-	Options    mongo.Options `json:"options"`
-	Data       bson.M        `json:"data"`
+	Collection    string        `json:"collection"`
+	Select        bson.M        `json:"select,omitempty"`
+	Options       mongo.Options `json:"options"`
+	Data          bson.M        `json:"data"`
+	IncludeFields []string      `json:"include_fields,omitempty"`
 }
 
 func (s Server) handleServerRequest(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +68,7 @@ func (s Server) get(w http.ResponseWriter, r *http.Request, method string) {
 		}
 	}
 
-	result, mongoErr := s.Client.Find(request.Collection, request.Select, request.Options)
+	result, mongoErr := s.Client.Find(request.Collection, request.Select, request.Options, request.IncludeFields)
 
 	if mongoErr != nil {
 		fmt.Println("Mongo error:", mongoErr)
