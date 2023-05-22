@@ -7,7 +7,7 @@
 curl --location --request GET 'http://localhost:8801/get' \
 &emsp;    --header 'Token: $SomeToken' \
 &emsp;    --header 'Content-Type: application/json' \
-&emsp;    --data-raw '{"collection":"$CollectionName",select":{"$KeyToSelect":"$ValueToSelect"}}'
+&emsp;    --data-raw '{"collection":"$CollectionName",select":{"$KeyToSelect":"$ValueToSelect"}, "include_fields":"[$FieldsToBeIncludedInResponse1","$FieldsToBeIncludedInResponse2"]}'
 
 - response example: {"result":[{"_id":"6431a25da6123e99c1598432","ch_time":1680974429,"cr_time":1680974429,"internal_id":"37f06418-34d3-4cff-9eb4-24d52786b371","sssss":"636037b417cde3a8fea98735"}]}
 
