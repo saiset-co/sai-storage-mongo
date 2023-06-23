@@ -15,9 +15,6 @@ type Configuration struct {
 		Host string
 		Port string
 	}
-	Address struct {
-		Url string
-	}
 	Token   string
 	Storage struct {
 		Atlas    bool
@@ -27,13 +24,10 @@ type Configuration struct {
 		Port     string
 		Database string
 	}
-	StartBlock int
-	WebSocket  struct {
+	WebSocket struct {
 		Token string
 		Url   string
 	}
-	Geth              []string
-	Sleep             int
 	UsePermissionAuth bool
 	SaiAuth           struct {
 		Host string

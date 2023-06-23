@@ -102,7 +102,8 @@ func (s Server) save(w http.ResponseWriter, r *http.Request, method string) {
 		}
 	}
 
-	request.Data["internal_id"] = uuid.New().String()
+	id := uuid.New().String()
+	request.Data["internal_id"] = id
 	request.Data["cr_time"] = time.Now().Unix()
 	request.Data["ch_time"] = time.Now().Unix()
 
@@ -113,7 +114,7 @@ func (s Server) save(w http.ResponseWriter, r *http.Request, method string) {
 		return
 	}
 
-	_, writeErr := w.Write(utils.ConvertInterfaceToJson(bson.M{"Status": "Ok"}))
+	_, writeErr := w.Write(utils.ConvertInterfaceToJson(bson.M{"Status": "Ok", "Result": id}))
 
 	if writeErr != nil {
 		fmt.Println("Write error:", writeErr)
@@ -176,14 +177,40 @@ func (s Server) upsert(w http.ResponseWriter, r *http.Request, method string) {
 		}
 	}
 
-	mongoErr := s.Client.Upsert(request.Collection, request.Select, request.Data)
+	result, mongoErr := s.Client.Find(request.Collection, request.Select, request.Options, request.IncludeFields)
 
 	if mongoErr != nil {
 		fmt.Println("Mongo error:", mongoErr)
 		return
 	}
 
-	_, writeErr := w.Write(utils.ConvertInterfaceToJson(bson.M{"Status": "Ok"}))
+	var id string
+
+	if len(result.Result) > 0 {
+		//update
+		id = request.Data["internal_id"].(string)
+		request.Data["ch_time"] = time.Now().Unix()
+
+		mongoErr := s.Client.Update(request.Collection, request.Select, bson.M{"$set": request.Data})
+		if mongoErr != nil {
+			fmt.Println("Mongo error:", mongoErr)
+			return
+		}
+	} else {
+		//insert
+		id = uuid.New().String()
+		request.Data["internal_id"] = id
+		request.Data["cr_time"] = time.Now().Unix()
+		request.Data["ch_time"] = time.Now().Unix()
+
+		mongoErr := s.Client.Insert(request.Collection, request.Data)
+		if mongoErr != nil {
+			fmt.Println("Mongo error:", mongoErr)
+			return
+		}
+	}
+
+	_, writeErr := w.Write(utils.ConvertInterfaceToJson(bson.M{"Status": "Ok", "Result": id}))
 
 	if writeErr != nil {
 		fmt.Println("Write error:", writeErr)
