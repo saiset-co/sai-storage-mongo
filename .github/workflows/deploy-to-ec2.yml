@@ -32,9 +32,9 @@ jobs:
           DIR_TO_UPLOAD="./"
           REMOTE_DIR=$EC2_REMOTE_DIR$SERVICE_NAME
           ls /home/runner/work/_temp/
-          cat /home/runner/work/_temp/*
+          cat /home/runner/work/_temp/*.sh
           go get
           ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'mkdir -p '$REMOTE_DIR
           rsync -avz --delete-before -e "ssh $SSH_OPTIONS" --exclude '.git' $DIR_TO_UPLOAD "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER:$REMOTE_DIR"
           ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'set -x ;cd '$REMOTE_DIR' && bash deploy.sh $SERVICE_NAME'
-          rm /tmp/id_rsa
+ 
