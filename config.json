@@ -24,5 +24,10 @@
     "SaiAuth": {
         "Host": "",
         "Port": ""
-    }
+    },
+    "Duplication": true,
+    "DuplicationURL": "http://devops.f1xiq.com:5380",
+    "DuplicationInterval": 3,
+    "DuplicateTimeout": 5,
+    "DuplicateMethod": "sync"
 }
