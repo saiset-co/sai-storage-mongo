@@ -210,7 +210,10 @@ func (s Server) upsert(w http.ResponseWriter, r *http.Request, method string) {
 
 	if len(result.Result) > 0 {
 		//update
-		id = request.Data["internal_id"].(string)
+		item, ok := result.Result[0].(map[string]interface{})
+		if ok {
+			id = item["internal_id"].(string)
+		}
 		request.Data["ch_time"] = time.Now().Unix()
 
 		mongoErr := s.Client.Update(request.Collection, request.Select, bson.M{"$set": request.Data})
