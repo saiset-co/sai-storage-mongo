@@ -335,8 +335,6 @@ func (s *Server) duplicateRequest(request jsonRequestType, storageMethod, handle
 				Method: handlerMethod,
 			}
 
-			log.Printf("json duplicate: %s", string(b))
-
 			data, err := json.Marshal(dupRequest)
 			if err != nil {
 				log.Printf("handler - %s - json.Marshal : %s", handlerMethod, err.Error())
