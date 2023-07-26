@@ -179,6 +179,7 @@ func (s Server) checkPermissionRequest(r *http.Request, collection, method strin
 func (s Server) duplicateRequests(ctx context.Context) {
 	for {
 		buf := <-s.DuplicateCh
+		log.Printf("duplicateRequests json.Marshal: %s", string(buf))
 
 		go func() {
 			dupRequest := &duplicatedRequest{
