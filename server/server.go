@@ -177,31 +177,24 @@ func (s Server) checkPermissionRequest(r *http.Request, collection, method strin
 
 // duplication request logic
 func (s Server) duplicateRequests(ctx context.Context) {
-	ticker := time.NewTicker(time.Duration(s.Config.DuplicationInterval) * time.Second)
 	for {
-		select {
-		case <-ctx.Done():
-			log.Println("duplicateRequests - ctx.Done()")
-			return
-		case <-ticker.C:
-			buf := <-s.DuplicateCh
-			client := http.Client{
-				Timeout: time.Duration(s.Config.DuplicateTimeout) * time.Second,
-			}
-			req, err := http.NewRequest("POST", s.Config.DuplicationURL, buf)
-			if err != nil {
-				log.Printf("duplicateRequests - http.NewRequest : %w", err)
-				continue
-			}
-			resp, err := client.Do(req)
-			if err != nil {
-				log.Printf("duplicateRequests - client.Do : %s", err.Error())
-				continue
-			}
-			if resp.StatusCode != 200 {
-				log.Printf("duplicateRequests - client.Do  - resp.StatusCode : %d, duplicationURL : %s)", resp.StatusCode, s.Config.DuplicationURL)
-				continue
-			}
+		buf := <-s.DuplicateCh
+		client := http.Client{
+			Timeout: time.Duration(s.Config.DuplicateTimeout) * time.Millisecond,
+		}
+		req, err := http.NewRequest("POST", s.Config.DuplicationURL, buf)
+		if err != nil {
+			log.Printf("duplicateRequests - http.NewRequest : %w", err)
+			continue
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Printf("duplicateRequests - client.Do : %s", err.Error())
+			continue
+		}
+		if resp.StatusCode != 200 {
+			log.Printf("duplicateRequests - client.Do  - resp.StatusCode : %d, duplicationURL : %s)", resp.StatusCode, s.Config.DuplicationURL)
+			continue
 		}
 	}
 }
