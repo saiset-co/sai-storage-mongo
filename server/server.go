@@ -23,7 +23,7 @@ type Server struct {
 	Config      config.Configuration
 	Websocket   bool
 	Client      *mongo.Client
-	DuplicateCh chan *bytes.Buffer
+	DuplicateCh chan []byte
 }
 
 type AuthRequest struct {
@@ -38,7 +38,7 @@ func NewServer(c config.Configuration, w bool) Server {
 	return Server{
 		Config:      c,
 		Websocket:   w,
-		DuplicateCh: make(chan *bytes.Buffer),
+		DuplicateCh: make(chan []byte),
 	}
 }
 
@@ -179,22 +179,37 @@ func (s Server) checkPermissionRequest(r *http.Request, collection, method strin
 func (s Server) duplicateRequests(ctx context.Context) {
 	for {
 		buf := <-s.DuplicateCh
-		client := http.Client{
-			Timeout: time.Duration(s.Config.DuplicateTimeout) * time.Millisecond,
-		}
-		req, err := http.NewRequest("POST", s.Config.DuplicationURL, buf)
-		if err != nil {
-			log.Printf("duplicateRequests - http.NewRequest : %w", err)
-			continue
-		}
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Printf("duplicateRequests - client.Do : %s", err.Error())
-			continue
-		}
-		if resp.StatusCode != 200 {
-			log.Printf("duplicateRequests - client.Do  - resp.StatusCode : %d, duplicationURL : %s)", resp.StatusCode, s.Config.DuplicationURL)
-			continue
-		}
+
+		go func() {
+			dupRequest := &duplicatedRequest{
+				Data:   buf,
+				Method: s.Config.DuplicateMethod,
+			}
+
+			dupRequestBytes, err := json.Marshal(dupRequest)
+			if err != nil {
+				log.Printf("handler - %s - json.Marshal : %s", string(buf), err.Error())
+				return
+			}
+
+			req, err := http.NewRequest("POST", s.Config.DuplicationURL, bytes.NewBuffer(dupRequestBytes))
+			if err != nil {
+				log.Printf("duplicateRequests - http.NewRequest : %w", err)
+				return
+			}
+
+			client := http.Client{
+				Timeout: time.Duration(s.Config.DuplicateTimeout) * time.Millisecond,
+			}
+			resp, err := client.Do(req)
+			if err != nil {
+				log.Printf("duplicateRequests - client.Do : %s", err.Error())
+				return
+			}
+			if resp.StatusCode != 200 {
+				log.Printf("duplicateRequests - client.Do  - resp.StatusCode : %d, duplicationURL : %s)", resp.StatusCode, s.Config.DuplicationURL)
+				return
+			}
+		}()
 	}
 }
