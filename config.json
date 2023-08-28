@@ -28,5 +28,6 @@
     "Duplication": true,
     "DuplicationURL": "http://devops.f1xiq.com:7880",
     "DuplicateTimeout": 20,
+    "DuplicatePause": 3,
     "DuplicateMethod": "notify"
 }
