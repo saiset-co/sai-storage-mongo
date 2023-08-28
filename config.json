@@ -1,58 +1,33 @@
 {
-  "http_server": {
-    "host": "0.0.0.0",
-    "port": 8818
-  },
-  "db": {
-    "local": {
-      "config": {
-        "username": "sai_user",
-        "password": "maxdata123",
-        "database": "sai"
-      },
-      "host": "127.0.0.1:27017",
-      "enabled": true
+    "HttpServer": {
+        "Host": "0.0.0.0",
+        "Port": "8801"
     },
-    "atlas": {
-      "config": {
-        "username": "Kirill",
-        "password": "2PF8qDc84ciLaeg4",
-        "database": "test"
-      },
-      "hosts": [
-        "cluster0-qglca.mongodb.net:27017"
-      ],
-      "connection_string": "Kirill:2PF8qDc84ciLaeg4@cluster0-qglca.mongodb.net/test",
-      "enabled": false
-    }
-  },
-  "auth": {
-    "super_admin": {
-      "email": "admin@saistorage.com",
-      "password": "123"
+    "HttpsServer": {
+        "Host": "0.0.0.0",
+        "Port": "8802"
     },
-    "enabled": true,
-    "default_roles": [
-      {
-        "name": "user",
-        "permissions": [
-          {
-            "url": "/get",
-            "params": [
-              {
-                "name": "collection",
-                "rules": [
-                  "!tokens"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "name": "super_admin",
-        "permissions": []
-      }
-    ]
-  }
+    "Storage": {
+        "Atlas": false,
+        "User": "",
+        "Pass": "",
+        "Host": "mongo-db",
+        "Port": "27017",
+        "Database": "sai"
+    },
+    "Token": "12345",
+    "WebSocket": {
+        "Token": "hv",
+        "Url": "http://sai-websocket:8820"
+    },
+    "UsePermissionAuth":false,
+    "SaiAuth": {
+        "Host": "",
+        "Port": ""
+    },
+    "Duplication": true,
+    "DuplicationURL": "http://devops.f1xiq.com:7880",
+    "DuplicateTimeout": 20,
+    "DuplicatePause": 3,
+    "DuplicateMethod": "notify"
 }
