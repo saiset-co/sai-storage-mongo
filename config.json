@@ -1,33 +1,34 @@
 {
     "HttpServer": {
         "Host": "0.0.0.0",
-        "Port": "8801"
+        "Port": "${HTTP_PORT}"
     },
     "HttpsServer": {
-        "Host": "0.0.0.0",
-        "Port": "8802"
+        "Host": "",
+        "Port": ""
     },
     "Storage": {
         "Atlas": false,
         "User": "",
         "Pass": "",
-        "Host": "mongo-db",
-        "Port": "27017",
-        "Database": "sai"
+        "Host": "${DB_HOST}",
+        "Port": "${DB_PORT}",
+        "Database": "${DB_NAME}",
+        "ConnectionString": "${DB_STRING}"
     },
-    "Token": "12345",
+    "Token": "${STORAGE_MASTER_TOKEN}",
     "WebSocket": {
-        "Token": "hv",
-        "Url": "http://sai-websocket:8820"
+        "Token": "",
+        "Url": ""
     },
     "UsePermissionAuth":false,
     "SaiAuth": {
         "Host": "",
         "Port": ""
     },
-    "Duplication": true,
-    "DuplicationURL": "http://devops.f1xiq.com:7880",
-    "DuplicateTimeout": 20,
-    "DuplicatePause": 3,
+    "Duplication": "${DUPLICATE}",
+    "DuplicationURL": "${DUPLICATE_URL}",
+    "DuplicateTimeout": 600,
+    "DuplicatePause": 1,
     "DuplicateMethod": "notify"
 }
