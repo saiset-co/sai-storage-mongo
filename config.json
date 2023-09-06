@@ -26,7 +26,7 @@
         "Host": "",
         "Port": ""
     },
-    "Duplication": "${DUPLICATE}",
+    "Duplication": ${DUPLICATE},
     "DuplicationURL": "${DUPLICATE_URL}",
     "DuplicateTimeout": 600,
     "DuplicatePause": 1,
