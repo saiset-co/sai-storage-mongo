@@ -14,6 +14,6 @@ jobs:
     with:
       config-path: .env.dev2
       #dir-to-upload: ./nginx/
-      dir-to-upload: ./
+      #dir-to-upload: ./
       #target: ${{ matrix.target }}
     secrets: inherit
