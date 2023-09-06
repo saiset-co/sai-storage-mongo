@@ -55,5 +55,5 @@ jobs:
           set -x
           ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'hostname;mkdir -p '$REMOTE_DIR
           rsync -avz -e "ssh $SSH_OPTIONS" --exclude '.git' $DIR_TO_UPLOAD "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER:$REMOTE_DIR"
-          ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'cd '$REMOTE_DIR' && docker build -t '$SERVICE_NAME' . && docker stop '$SERVICE_NAME';docker rm '$SERVICE_NAME'; docker run -d -p '$EXPOSE_PORT':'$HTTP_PORT' --restart unless-stopped --name '$SERVICE_NAME $SERVICE_NAME
+          ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'cd '$REMOTE_DIR' && make up'
           #rm /tmp/id_rsa
