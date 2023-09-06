@@ -45,8 +45,8 @@ jobs:
           cat $CONFIG
           source $CONFIG
 
-          echo "${SSH_EC2_PRIVATE_KEY}" > $DIR_TO_UPLOAD/id_rsa
-          echo "${SSH_EC2_PRIVATE_KEY_23}" > /tmp/id_rsa
+          echo "${SSH_EC2_PRIVATE_KEY}" |base64 -d > /tmp/id_rsa
+          #echo "${SSH_EC2_PRIVATE_KEY_23}" > /tmp/id_rsa
           chmod 600 /tmp/id_rsa
           mkdir -p ~/.ssh
           ssh-keyscan "$EC2_REMOTE_SERVER" >> ~/.ssh/known_hosts
