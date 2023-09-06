@@ -37,7 +37,7 @@ jobs:
           REMOTE_DIR=$EC2_REMOTE_DIR$SERVICE_NAME
           BRANCH=$(git branch --show-current)
           if [ ! -z "$CONFIG_PATH" ];then
-            CONFIG=$CONFIG_PATH"
+            CONFIG=$CONFIG_PATH
           else
             CONFIG=.env.$BRANCH
           fi
