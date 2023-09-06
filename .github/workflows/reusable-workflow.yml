@@ -44,6 +44,8 @@ jobs:
           echo "reading branch $BRANCH config $CONFIG"
           cat $CONFIG
           source $CONFIG
+          mv config.json config-template.json 
+          cat config-template.json |envsubst > config.json
 
           echo "${SSH_EC2_PRIVATE_KEY}" |base64 -d > /tmp/id_rsa
           #echo "${SSH_EC2_PRIVATE_KEY_23}" > /tmp/id_rsa
