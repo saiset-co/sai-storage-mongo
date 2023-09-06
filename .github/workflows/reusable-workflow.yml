@@ -8,6 +8,8 @@ on:
         type: string
       dir-to-upload:
         type: string
+      service-tag:
+        type: string
     #secrets:
       #token:
         #required: true
