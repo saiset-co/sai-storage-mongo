@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/reusable-workflow.yml
     with:
       service-tag: auth
-      #config-path: .env.master
+      config-path: .env.dev_auth
       #dir-to-upload: ./nginx/
       #dir-to-upload: ./
       #target: ${{ matrix.target }}
