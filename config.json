@@ -4,7 +4,7 @@
         "Port": "${HTTP_PORT}"
     },
     "HttpsServer": {
-        "Host": "0.0.0.0"",
+        "Host": "0.0.0.0",
         "Port": "${HTTPS_PORT}"
     },
     "Storage": {
