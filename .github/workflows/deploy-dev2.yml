@@ -10,7 +10,7 @@ jobs:
   build-and-deploy:
     #strategy:
     #  matrix: [dev,dev2,stage,prod]
-    uses: ./aws-deploy/.github/workflows/reusable-workflow.yml
+    uses: ./.github/workflows/reusable-workflow.yml
     with:
       config-path: .env.dev2
       #dir-to-upload: ./nginx/
