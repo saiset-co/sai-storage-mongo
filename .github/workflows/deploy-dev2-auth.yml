@@ -1,4 +1,4 @@
-name: Deploy to DEV2
+name: Deploy to DEV2 AUTH
 # https://docs.github.com/en/actions/using-workflows/reusing-workflows
 # see https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-a-matrix-strategy-with-a-reusable-workflow
 on:
