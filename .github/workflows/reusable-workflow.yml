@@ -27,6 +27,7 @@ jobs:
           SSH_EC2_PRIVATE_KEY_23: ${{ secrets.SSH_EC2_PRIVATE_KEY_2023 }}
           REPO_TOKEN: ${{ secrets.token }}
           DIR_TO_UPLOAD: ${{ inputs.dir-to-upload || './' }}
+          TAG: ${{ inputs.service-tag || '' }}
           EC2_REMOTE_USER: ${{ vars.EC2_REMOTE_USER }}
           EC2_REMOTE_SERVER: ${{ vars.EC2_REMOTE_SERVER }}
           EC2_REMOTE_DIR: ${{ vars.EC2_REMOTE_DIR }}
@@ -34,7 +35,7 @@ jobs:
         run: |
           REPO_NAME=$(git rev-parse --show-toplevel)
           SERVICE_NAME=$(basename $REPO_NAME)
-          REMOTE_DIR=$EC2_REMOTE_DIR$SERVICE_NAME
+          REMOTE_DIR=$EC2_REMOTE_DIR$SERVICE_NAME$TAG
           BRANCH=$(git branch --show-current)
           if [ ! -z "$CONFIG_PATH" ];then
             CONFIG=$CONFIG_PATH
