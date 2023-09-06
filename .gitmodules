@@ -1,0 +1,3 @@
+[submodule "aws-deploy"]
+	path = aws-deploy
+	url = https://github.com/Limpid-LLC/aws-deploy.git
