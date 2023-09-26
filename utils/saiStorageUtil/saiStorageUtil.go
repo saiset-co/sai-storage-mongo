@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"go.mongodb.org/mongo-driver/bson"
-
 	"github.com/webmakom-com/saiStorage/utils/saiUtil"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Database struct {

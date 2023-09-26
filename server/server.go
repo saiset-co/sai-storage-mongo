@@ -12,12 +12,12 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/webmakom-com/saiStorage/config"
 	"github.com/webmakom-com/saiStorage/mongo"
 	"github.com/webmakom-com/saiStorage/websocket"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Server struct {
