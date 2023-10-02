@@ -63,6 +63,10 @@ func (s Server) handleServerRequest(w http.ResponseWriter, r *http.Request) {
 		{
 			s.remove(w, r, "remove")
 		}
+	case "/create_indexes":
+		{
+			s.createIndexes(w, r, "create_indexes")
+		}
 	}
 }
 
@@ -312,6 +316,40 @@ func (s Server) remove(w http.ResponseWriter, r *http.Request, method string) {
 	request.Result = result.Result
 
 	go s.duplicateRequest(request, removeMethod)
+
+	_, writeErr := w.Write(utils.ConvertInterfaceToJson(bson.M{"Status": "Ok"}))
+
+	if writeErr != nil {
+		fmt.Println("Write error:", writeErr)
+		return
+	}
+}
+
+func (s Server) createIndexes(w http.ResponseWriter, r *http.Request, method string) {
+	var request jsonRequestType
+	decoder := json.NewDecoder(r.Body)
+	decoderErr := decoder.Decode(&request)
+
+	if decoderErr != nil {
+		fmt.Printf("Wrong JSON: %v", decoderErr)
+		return
+	}
+
+	if s.Config.UsePermissionAuth {
+		err := s.checkPermissionRequest(r, request.Collection, method, request.Select)
+		if err != nil {
+			fmt.Println(err)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	}
+
+	mongoErr := s.Client.CreateIndex(request.Collection, request.Data)
+
+	if mongoErr != nil {
+		fmt.Println("Mongo error:", mongoErr)
+		return
+	}
 
 	_, writeErr := w.Write(utils.ConvertInterfaceToJson(bson.M{"Status": "Ok"}))
 

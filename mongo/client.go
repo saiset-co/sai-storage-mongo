@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -217,6 +218,36 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 	selector = c.preprocessSelector(selector)
 
 	_, err := collection.DeleteMany(context.TODO(), selector)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c Client) CreateIndex(collectionName string, data map[string]interface{}) error {
+	collection := c.GetCollection(collectionName)
+	keys, ok := data["keys"].(bson.D)
+
+	if !ok {
+		return errors.New("wrong request structure")
+	}
+
+	unique, ok := data["unique"].(bool)
+
+	if !ok {
+		return errors.New("wrong request structure")
+	}
+
+	indexModel := mongo.IndexModel{
+		Keys: keys,
+	}
+
+	if unique {
+		indexModel.Options = options.Index().SetUnique(true)
+	}
+
+	_, err := collection.Indexes().CreateOne(context.TODO(), indexModel)
 	if err != nil {
 		return err
 	}
