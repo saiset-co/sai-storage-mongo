@@ -1,0 +1,66 @@
+name: Reusable Deploy to EC2
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        #required: true
+        type: string
+      dir-to-upload:
+        type: string
+      service-tag:
+        type: string
+    #secrets:
+      #token:
+        #required: true
+
+jobs:
+  deploy-job:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy
+        env:
+          CONFIG_PATH: ${{ inputs.config-path }}
+          SSH_EC2_PRIVATE_KEY: ${{ secrets.SSH_EC2_PRIVATE_KEY }}
+          SSH_EC2_PRIVATE_KEY_23: ${{ secrets.SSH_EC2_PRIVATE_KEY_2023 }}
+          REPO_TOKEN: ${{ secrets.token }}
+          DIR_TO_UPLOAD: ${{ inputs.dir-to-upload || './' }}
+          TAG: ${{ inputs.service-tag || '' }}
+          EC2_REMOTE_USER: ${{ vars.EC2_REMOTE_USER }}
+          EC2_REMOTE_SERVER: ${{ vars.EC2_REMOTE_SERVER }}
+          EC2_REMOTE_DIR: ${{ vars.EC2_REMOTE_DIR }}
+          SSH_OPTIONS: "-o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i /tmp/id_rsa"
+        run: |
+          REPO_NAME=$(git rev-parse --show-toplevel)
+          SERVICE_NAME=$(basename $REPO_NAME)
+          REMOTE_DIR=$EC2_REMOTE_DIR$SERVICE_NAME$TAG
+          BRANCH=$(git branch --show-current)
+          if [ ! -z "$CONFIG_PATH" ];then
+            CONFIG=$CONFIG_PATH
+          else
+            CONFIG=.env.$BRANCH
+          fi
+          echo "reading branch $BRANCH config $CONFIG"
+          cat $CONFIG
+          source $CONFIG
+          mv docker-compose.yml docker-compose-template.yml 
+          cat docker-compose-template.yml |envsubst > docker-compose.yml
+          mv config.json config-template.json 
+          cat config-template.json |envsubst > config.json
+
+          echo "${SSH_EC2_PRIVATE_KEY}" |base64 -d > /tmp/id_rsa
+          #echo "${SSH_EC2_PRIVATE_KEY_23}" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+          mkdir -p ~/.ssh
+          ssh-keyscan "$EC2_REMOTE_SERVER" >> ~/.ssh/known_hosts
+          #
+          echo "Start $SERVICE_NAME dir $DIR_TO_UPLOAD upload to: $REMOTE_DIR"
+          set -x
+          ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'hostname;mkdir -p '$REMOTE_DIR
+          rsync -avz -e "ssh $SSH_OPTIONS" --exclude '.git' $DIR_TO_UPLOAD "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER:$REMOTE_DIR"
+          ssh $SSH_OPTIONS "$EC2_REMOTE_USER@$EC2_REMOTE_SERVER" 'cd '$REMOTE_DIR' && make up'
+          #rm /tmp/id_rsa
