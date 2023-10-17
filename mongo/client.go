@@ -228,19 +228,19 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 
 func (c Client) CreateIndex(collectionName string, data map[string]interface{}) error {
 	collection := c.GetCollection(collectionName)
-	keys, ok := data["keys"]
+	keysData, ok := data["keys"]
 
 	if !ok {
 		log.Println("data", data)
-		log.Println("keys", keys)
+		log.Println("keys", keysData)
 		return errors.New("wrong request structure")
 	}
 
-	keyList := keys.(bson.D)
+	keysI := keysData.([]interface{})
 
 	if !ok {
 		log.Println("data", data)
-		log.Println("keyList", keyList)
+		log.Println("keyList", keysI)
 		return errors.New("wrong request structure")
 	}
 
@@ -252,8 +252,20 @@ func (c Client) CreateIndex(collectionName string, data map[string]interface{}) 
 		return errors.New("wrong request structure")
 	}
 
+	var keys bson.D
+
+	for i, v := range keysI {
+		value, ok := v.(bson.E)
+		if !ok {
+			log.Println("data", data)
+			log.Println("value", value)
+			return errors.New("wrong request structure")
+		}
+		keys[i] = value
+	}
+
 	indexModel := mongo.IndexModel{
-		Keys: keyList,
+		Keys: keys,
 	}
 
 	if unique {
