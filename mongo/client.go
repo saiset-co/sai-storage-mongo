@@ -254,14 +254,14 @@ func (c Client) CreateIndex(collectionName string, data map[string]interface{}) 
 
 	var keyList []bson.M
 
-	for _,v := range keys {
+	for _, v := range keys {
 		value, ok := v.(bson.M)
 		if !ok {
 			log.Println("data", data)
 			log.Println("value", value)
 			return errors.New("wrong request structure")
 		}
-		keyList  = append(keyList, value)
+		keyList = append(keyList, value)
 	}
 
 	indexModel := mongo.IndexModel{
