@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
@@ -252,7 +253,11 @@ func (c Client) CreateIndex(collectionName string, data interface{}) error {
 
 	for _, v := range _data.Keys {
 		for _i, _v := range v {
-			value := _v.(float64)
+			value, ok := _v.(float64)
+			if !ok {
+				log.Println("_v", _v)
+				return errors.New("index value not an integer")
+			}
 			keys = append(keys, bsonx.Elem{Key: _i, Value: bsonx.Int32(int32(value))})
 		}
 	}
