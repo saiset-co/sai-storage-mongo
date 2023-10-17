@@ -5,17 +5,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
 	"reflect"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	"github.com/webmakom-com/saiStorage/config"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
+
+	"github.com/webmakom-com/saiStorage/config"
 )
 
 type Client struct {
@@ -290,7 +290,7 @@ func (c Client) GetIndex(collectionName string) ([]interface{}, error) {
 	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
-		index := &mongo.IndexModel{}
+		var index interface{}
 		decodeErr := cur.Decode(&index)
 
 		if decodeErr != nil {
