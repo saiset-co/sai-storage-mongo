@@ -67,6 +67,10 @@ func (s Server) handleServerRequest(w http.ResponseWriter, r *http.Request) {
 		{
 			s.createIndexes(w, r, "create_indexes")
 		}
+	case "/get_indexes":
+		{
+			s.getIndexes(w, r, "get_indexes")
+		}
 	}
 }
 
@@ -355,6 +359,44 @@ func (s Server) createIndexes(w http.ResponseWriter, r *http.Request, method str
 
 	if writeErr != nil {
 		fmt.Println("Write error:", writeErr)
+		return
+	}
+}
+
+func (s Server) getIndexes(w http.ResponseWriter, r *http.Request, method string) {
+	var request jsonRequestType
+	decoder := json.NewDecoder(r.Body)
+	decoderErr := decoder.Decode(&request)
+
+	if decoderErr != nil {
+		fmt.Printf("Wrong JSON: %v", decoderErr)
+		return
+	}
+
+	if s.Config.UsePermissionAuth {
+		err := s.checkPermissionRequest(r, request.Collection, method, request.Select)
+		if err != nil {
+			fmt.Println(err)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	}
+
+	result, mongoErr := s.Client.GetIndex(request.Collection)
+
+	if mongoErr != nil {
+		fmt.Println("Mongo error:", mongoErr)
+		return
+	}
+
+	request.Result = result
+
+	go s.duplicateRequest(request, getMethod)
+
+	_, writeErr := w.Write(utils.ConvertInterfaceToJson(result))
+
+	if writeErr != nil {
+		log.Println("Write error:", writeErr)
 		return
 	}
 }

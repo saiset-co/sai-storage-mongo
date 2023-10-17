@@ -273,6 +273,36 @@ func (c Client) CreateIndex(collectionName string, data interface{}) error {
 	return nil
 }
 
+func (c Client) GetIndex(collectionName string) ([]interface{}, error) {
+	var result []interface{}
+	collection := c.GetCollection(collectionName)
+
+	cur, err := collection.Indexes().List(context.TODO())
+	if err != nil {
+		return result, err
+	}
+
+	defer cur.Close(context.TODO())
+
+	for cur.Next(context.TODO()) {
+		index := &mongo.IndexModel{}
+		decodeErr := cur.Decode(&index)
+
+		if decodeErr != nil {
+			return result, decodeErr
+		}
+
+		result = append(result, index)
+		break
+	}
+
+	if cursorErr := cur.Err(); cursorErr != nil {
+		return result, cursorErr
+	}
+
+	return result, nil
+}
+
 func (c Client) preprocessSelector(selector map[string]interface{}) map[string]interface{} {
 	if selector["_id"] != nil {
 		switch selector["_id"].(type) {
