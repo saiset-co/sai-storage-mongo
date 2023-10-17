@@ -228,11 +228,19 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 
 func (c Client) CreateIndex(collectionName string, data map[string]interface{}) error {
 	collection := c.GetCollection(collectionName)
-	keys, ok := data["keys"].([]interface{})
+	keys, ok := data["keys"]
 
 	if !ok {
 		log.Println("data", data)
 		log.Println("keys", keys)
+		return errors.New("wrong request structure")
+	}
+
+	keyList := keys.([]interface{})
+
+	if !ok {
+		log.Println("data", data)
+		log.Println("keyList", keyList)
 		return errors.New("wrong request structure")
 	}
 
