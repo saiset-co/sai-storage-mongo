@@ -227,8 +227,8 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 }
 
 type Data struct {
-	Keys   bson.D `bson:"keys" json:"keys"`
-	Unique bool   `bson:"unique" json:"unique"`
+	Keys   []bson.M `bson:"keys" json:"keys"`
+	Unique bool     `bson:"unique" json:"unique"`
 }
 
 func (c Client) CreateIndex(collectionName string, data interface{}) error {
@@ -247,8 +247,16 @@ func (c Client) CreateIndex(collectionName string, data interface{}) error {
 		return err
 	}
 
+	keys := bson.D{}
+
+	for _, v := range _data.Keys {
+		for _i, _v := range v {
+			keys = append(keys, bson.E{Key: _i, Value: _v})
+		}
+	}
+
 	indexModel := mongo.IndexModel{
-		Keys: _data.Keys,
+		Keys: keys,
 	}
 
 	if _data.Unique {
