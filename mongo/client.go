@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -226,53 +226,36 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 	return nil
 }
 
-func (c Client) CreateIndex(collectionName string, data map[string]interface{}) error {
+type Data struct {
+	Keys   bson.D `json:"keys" bson:"keys"`
+	Unique bool   `bson:"unique" json:"unique"`
+}
+
+func (c Client) CreateIndex(collectionName string, data interface{}) error {
 	collection := c.GetCollection(collectionName)
-	keysData, ok := data["keys"]
+	var _data Data
 
-	if !ok {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
 		log.Println("data", data)
-		log.Println("keys", keysData)
-		return errors.New("wrong request structure")
+		return err
 	}
 
-	keys := keysData.([]interface{})
-
-	if !ok {
-		log.Println("data", data)
-		log.Println("keyList", keys)
-		return errors.New("wrong request structure")
-	}
-
-	unique, ok := data["unique"].(bool)
-
-	if !ok {
-		log.Println("data", data)
-		log.Println("unique", unique)
-		return errors.New("wrong request structure")
-	}
-
-	var keyList []bson.M
-
-	for _, v := range keys {
-		value, ok := v.(bson.M)
-		if !ok {
-			log.Println("data", data)
-			log.Println("value", value)
-			return errors.New("wrong request structure")
-		}
-		keyList = append(keyList, value)
+	err = json.Unmarshal(jsonData, &_data)
+	log.Println("jsonData", jsonData)
+	if err != nil {
+		return err
 	}
 
 	indexModel := mongo.IndexModel{
-		Keys: keys,
+		Keys: _data.Keys,
 	}
 
-	if unique {
+	if _data.Unique {
 		indexModel.Options = options.Index().SetUnique(true)
 	}
 
-	_, err := collection.Indexes().CreateOne(context.TODO(), indexModel)
+	_, err = collection.Indexes().CreateOne(context.TODO(), indexModel)
 	if err != nil {
 		return err
 	}
