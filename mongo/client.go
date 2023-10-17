@@ -227,8 +227,8 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 }
 
 type Data struct {
-	Keys   bson.D `json:"keys" bson:"keys"`
-	Unique bool   `bson:"unique" json:"unique"`
+	Keys   []bson.M `bson:"keys" json:"keys"`
+	Unique bool     `bson:"unique" json:"unique"`
 }
 
 func (c Client) CreateIndex(collectionName string, data interface{}) error {
