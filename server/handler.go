@@ -63,9 +63,9 @@ func (s Server) handleServerRequest(w http.ResponseWriter, r *http.Request) {
 		{
 			s.remove(w, r, "remove")
 		}
-	case "/create_indexes":
+	case "/create_index":
 		{
-			s.createIndexes(w, r, "create_indexes")
+			s.createIndex(w, r, "create_index")
 		}
 	case "/get_indexes":
 		{
@@ -329,7 +329,7 @@ func (s Server) remove(w http.ResponseWriter, r *http.Request, method string) {
 	}
 }
 
-func (s Server) createIndexes(w http.ResponseWriter, r *http.Request, method string) {
+func (s Server) createIndex(w http.ResponseWriter, r *http.Request, method string) {
 	var request jsonRequestType
 	decoder := json.NewDecoder(r.Body)
 	decoderErr := decoder.Decode(&request)
