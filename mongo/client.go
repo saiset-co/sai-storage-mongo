@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
 	"reflect"
 	"time"
@@ -247,11 +248,12 @@ func (c Client) CreateIndex(collectionName string, data interface{}) error {
 		return err
 	}
 
-	keys := bson.D{}
+	keys := bsonx.Doc{}
 
 	for _, v := range _data.Keys {
 		for _i, _v := range v {
-			keys = append(keys, bson.E{Key: _i, Value: _v})
+			value := _v.(float64)
+			keys = append(keys, bsonx.Elem{Key: _i, Value: bsonx.Int32(int32(value))})
 		}
 	}
 
