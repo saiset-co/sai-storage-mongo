@@ -228,7 +228,7 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 
 func (c Client) CreateIndex(collectionName string, data map[string]interface{}) error {
 	collection := c.GetCollection(collectionName)
-	keys, ok := data["keys"].([]map[string]interface{})
+	keys, ok := data["keys"].([]interface{})
 
 	if !ok {
 		log.Println("data", data)
