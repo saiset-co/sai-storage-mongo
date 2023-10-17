@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"time"
 
@@ -230,12 +231,16 @@ func (c Client) CreateIndex(collectionName string, data map[string]interface{}) 
 	keys, ok := data["keys"].(bson.D)
 
 	if !ok {
+		log.Println("data", data)
+		log.Println("keys", keys)
 		return errors.New("wrong request structure")
 	}
 
 	unique, ok := data["unique"].(bool)
 
 	if !ok {
+		log.Println("data", data)
+		log.Println("unique", unique)
 		return errors.New("wrong request structure")
 	}
 
