@@ -131,7 +131,12 @@ func (s Server) save(w http.ResponseWriter, r *http.Request, method string) {
 		}
 	}
 
-	id := uuid.New().String()
+	id, ok := request.Data["internal_id"].(string)
+
+	if !ok || id == "" {
+		id = uuid.New().String()
+	}
+
 	request.Data["internal_id"] = id
 	request.Data["cr_time"] = time.Now().Unix()
 	request.Data["ch_time"] = time.Now().Unix()
@@ -258,7 +263,12 @@ func (s Server) upsert(w http.ResponseWriter, r *http.Request, method string) {
 
 	} else {
 		//insert
-		id = uuid.New().String()
+		id, ok := request.Data["internal_id"].(string)
+
+		if !ok || id == "" {
+			id = uuid.New().String()
+		}
+
 		request.Data["internal_id"] = id
 		request.Data["cr_time"] = time.Now().Unix()
 		request.Data["ch_time"] = time.Now().Unix()
