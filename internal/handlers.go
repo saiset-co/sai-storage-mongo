@@ -7,15 +7,15 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
+	"github.com/saiset-co/sai-service/service"
 	"github.com/saiset-co/sai-storage-mongo/internal/actions"
 	"github.com/saiset-co/sai-storage-mongo/logger"
 	"github.com/saiset-co/sai-storage-mongo/types"
-	"github.com/saiset-co/saiService"
 )
 
-func (is InternalService) NewHandler() saiService.Handler {
-	return saiService.Handler{
-		"create": saiService.HandlerElement{
+func (is InternalService) NewHandler() service.Handler {
+	return service.Handler{
+		"create": service.HandlerElement{
 			Name:        "Create documents",
 			Description: "Create documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
@@ -27,7 +27,7 @@ func (is InternalService) NewHandler() saiService.Handler {
 				return actions.NewSaveAction(is.Client).Handle(request)
 			},
 		},
-		"read": saiService.HandlerElement{
+		"read": service.HandlerElement{
 			Name:        "Read documents",
 			Description: "Read documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
@@ -39,7 +39,7 @@ func (is InternalService) NewHandler() saiService.Handler {
 				return actions.NewGetAction(is.Client).Handle(request)
 			},
 		},
-		"update": saiService.HandlerElement{
+		"update": service.HandlerElement{
 			Name:        "Update documents",
 			Description: "Update documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
@@ -51,7 +51,7 @@ func (is InternalService) NewHandler() saiService.Handler {
 				return actions.NewUpdateAction(is.Client).Handle(request)
 			},
 		},
-		"upsert": saiService.HandlerElement{
+		"upsert": service.HandlerElement{
 			Name:        "Upsert documents",
 			Description: "Upsert documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
@@ -63,7 +63,7 @@ func (is InternalService) NewHandler() saiService.Handler {
 				return actions.NewUpsertAction(is.Client).Handle(request)
 			},
 		},
-		"delete": saiService.HandlerElement{
+		"delete": service.HandlerElement{
 			Name:        "Delete documents",
 			Description: "Delete documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
@@ -75,7 +75,7 @@ func (is InternalService) NewHandler() saiService.Handler {
 				return actions.NewDeleteAction(is.Client).Handle(request)
 			},
 		},
-		"aggregate": saiService.HandlerElement{
+		"aggregate": service.HandlerElement{
 			Name:        "Aggregate documents",
 			Description: "Aggregate documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
