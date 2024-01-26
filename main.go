@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/saiset-co/sai-service/service"
 	"github.com/saiset-co/sai-storage-mongo/internal"
 	"github.com/saiset-co/sai-storage-mongo/logger"
 	"github.com/saiset-co/sai-storage-mongo/mongo"
 	"github.com/saiset-co/sai-storage-mongo/types"
-	"github.com/saiset-co/saiService"
 )
 
 func main() {
 	name := "SaiStorage"
 
-	svc := saiService.NewService(name)
+	svc := service.NewService(name)
 
 	svc.RegisterConfig("config.yml")
 
