@@ -1,14 +1,14 @@
-module github.com/saiset-co/saiStorage
+module github.com/saiset-co/saiStorageMongo
 
-go 1.21
+go 1.21.1
 
 require (
-	github.com/go-playground/validator/v10 v10.16.0
+	github.com/go-playground/validator/v10 v10.17.0
 	github.com/google/uuid v1.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/saiset-co/saiService v1.0.3
 	go.mongodb.org/mongo-driver v1.13.1
-	go.uber.org/zap v1.25.0
+	go.uber.org/zap v1.26.0
 )
 
 require (

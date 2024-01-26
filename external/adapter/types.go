@@ -1,6 +1,6 @@
 package adapter
 
-import "github.com/saiset-co/saiStorage/types"
+import "github.com/saiset-co/saiStorageMongo/types"
 
 type IRequest interface {
 	GetMethod() string
