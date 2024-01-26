@@ -5,17 +5,21 @@ WORKDIR /src/
 
 COPY ./ /src/
 
-RUN go build -o service-bin -buildvcs=false
+RUN go build -o sai-storage-bin -buildvcs=false
 
 FROM ubuntu
 
 WORKDIR /srv
 
 # Copy binary from build stage
-COPY --from=BUILD /src/service-bin /srv/service-bin
-COPY --from=BUILD /src/config.json /srv/config.json
+COPY --from=BUILD /src/sai-storage-bin /srv/sai-storage-bin
 
-RUN chmod +x /srv/service-bin
+# Copy other files
+COPY ./config.yml /srv/config.yml
+
+RUN chmod +x /srv/sai-storage-bin
 
 # Set command to run your binary
-CMD /srv/service-bin start
+CMD /srv/sai-storage-bin start
+
+EXPOSE 8880

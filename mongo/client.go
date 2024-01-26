@@ -2,53 +2,41 @@ package mongo
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	"github.com/webmakom-com/saiStorage/config"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
+
+	"github.com/saiset-co/saiStorage/logger"
+	"github.com/saiset-co/saiStorage/types"
 )
 
 type Client struct {
-	Config config.Configuration
+	Config *types.StorageConfig
 	Host   *mongo.Client
 	Ctx    context.Context
 }
 
-type FindResult struct {
-	Count  int64         `json:"count,omitempty"`
-	Result []interface{} `json:"result,omitempty"`
-}
-
-type Options struct {
-	Limit int64  `json:"limit"`
-	Skip  int64  `json:"skip"`
-	Sort  bson.M `json:"sort"`
-	Count int64  `json:"count"`
-}
-
-func NewMongoClient(config config.Configuration) (Client, error) {
+func NewMongoClient(config *types.StorageConfig) (*Client, error) {
 	var host *mongo.Client
 	var hostErr error
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if config.Storage.ConnectionString != "" {
-		host, _ = mongo.NewClient(options.Client().ApplyURI(config.Storage.ConnectionString))
+	if config.ConnectionString != "" {
+		host, _ = mongo.NewClient(options.Client().ApplyURI(config.ConnectionString))
 
 		hostErr = host.Connect(ctx)
 	} else {
-		switch config.Storage.Atlas {
+		switch config.Atlas {
 		case false:
 			{
 				host, _ = mongo.NewClient(options.Client().ApplyURI(
-					"mongodb://" + config.Storage.Host + ":" + config.Storage.Port + "/" + config.Storage.Database,
+					"mongodb://" + config.Host + ":" + config.Port + "/" + config.Database,
 				))
 
 				hostErr = host.Connect(ctx)
@@ -56,13 +44,13 @@ func NewMongoClient(config config.Configuration) (Client, error) {
 		default:
 			{
 				host, hostErr = mongo.Connect(ctx, options.Client().ApplyURI(
-					"mongodb+srv://"+config.Storage.User+":"+config.Storage.Pass+"@"+config.Storage.Host+"/"+config.Storage.Database+"?ssl=true&authSource=admin&retryWrites=true&w=majority",
+					"mongodb+srv://"+config.User+":"+config.Pass+"@"+config.Host+"/"+config.Database+"?ssl=true&authSource=admin&retryWrites=true&w=majority",
 				))
 			}
 		}
 	}
 
-	client := Client{
+	client := &Client{
 		Ctx:    ctx,
 		Config: config,
 		Host:   host,
@@ -76,7 +64,7 @@ func NewMongoClient(config config.Configuration) (Client, error) {
 }
 
 func (c Client) GetCollection(collectionName string) *mongo.Collection {
-	return c.Host.Database(c.Config.Storage.Database).Collection(collectionName)
+	return c.Host.Database(c.Config.Database).Collection(collectionName)
 }
 
 func (c Client) FindOne(collectionName string, selector map[string]interface{}) (map[string]interface{}, error) {
@@ -86,6 +74,7 @@ func (c Client) FindOne(collectionName string, selector map[string]interface{}) 
 	cur, err := collection.Find(context.TODO(), selector)
 
 	if err != nil {
+		logger.Logger.Error("FindOne", zap.Error(err))
 		return result, err
 	}
 
@@ -96,6 +85,7 @@ func (c Client) FindOne(collectionName string, selector map[string]interface{}) 
 		decodeErr := cur.Decode(&elem)
 
 		if decodeErr != nil {
+			logger.Logger.Error("FindOne", zap.Error(decodeErr))
 			return result, decodeErr
 		}
 
@@ -104,37 +94,37 @@ func (c Client) FindOne(collectionName string, selector map[string]interface{}) 
 	}
 
 	if cursorErr := cur.Err(); cursorErr != nil {
+		logger.Logger.Error("FindOne", zap.Error(cursorErr))
 		return result, cursorErr
 	}
 
 	return result, nil
 }
 
-func (c Client) Find(collectionName string, selector map[string]interface{}, inputOptions Options, includeFields []string) (*FindResult, error) {
-	findResult := &FindResult{}
+func (c Client) Find(collectionName string, selector map[string]interface{}, inputOptions *types.Options, includeFields []string) (*types.FindResult, error) {
+	findResult := &types.FindResult{}
 	requestOptions := options.Find()
 
-	if inputOptions.Count != 0 {
+	if inputOptions != nil && inputOptions.Count != 0 {
 		collection := c.GetCollection(collectionName)
 		selector = c.preprocessSelector(selector)
 		count, err := collection.CountDocuments(context.TODO(), selector)
 		if err != nil {
-			return &FindResult{}, err
+			logger.Logger.Error("Find", zap.Error(err))
+			return &types.FindResult{}, err
 		}
-		return &FindResult{
-			Count: count,
-		}, nil
+		findResult.Count = count
 	}
 
-	if inputOptions.Sort != nil {
+	if inputOptions != nil && inputOptions.Sort != nil {
 		requestOptions.SetSort(inputOptions.Sort)
 	}
 
-	if inputOptions.Skip != 0 {
+	if inputOptions != nil && inputOptions.Skip != 0 {
 		requestOptions.SetSkip(inputOptions.Skip)
 	}
 
-	if inputOptions.Limit != 0 {
+	if inputOptions != nil && inputOptions.Limit != 0 {
 		requestOptions.SetLimit(inputOptions.Limit)
 	}
 
@@ -152,7 +142,8 @@ func (c Client) Find(collectionName string, selector map[string]interface{}, inp
 	cur, err := collection.Find(context.TODO(), selector, requestOptions)
 
 	if err != nil {
-		return &FindResult{}, err
+		logger.Logger.Error("Find", zap.Error(err))
+		return &types.FindResult{}, err
 	}
 
 	defer cur.Close(context.TODO())
@@ -162,13 +153,15 @@ func (c Client) Find(collectionName string, selector map[string]interface{}, inp
 		decodeErr := cur.Decode(&elem)
 
 		if decodeErr != nil {
-			return &FindResult{}, decodeErr
+			logger.Logger.Error("Find", zap.Error(decodeErr))
+			return &types.FindResult{}, decodeErr
 		}
 
 		findResult.Result = append(findResult.Result, elem)
 	}
 
 	if cursorErr := cur.Err(); cursorErr != nil {
+		logger.Logger.Error("Find", zap.Error(cursorErr))
 		return findResult, cursorErr
 	}
 
@@ -181,6 +174,20 @@ func (c Client) Insert(collectionName string, doc interface{}) (*mongo.InsertOne
 	//processedDoc := c.preprocessDoc(doc)
 	result, err := collection.InsertOne(context.TODO(), doc)
 	if err != nil {
+		logger.Logger.Error("Insert", zap.Error(err))
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (c Client) InsertMany(collectionName string, docs []interface{}) (*mongo.InsertManyResult, error) {
+	collection := c.GetCollection(collectionName)
+
+	//processedDoc := c.preprocessDoc(doc)
+	result, err := collection.InsertMany(context.TODO(), docs)
+	if err != nil {
+		logger.Logger.Error("InsertMany", zap.Error(err))
 		return nil, err
 	}
 
@@ -193,6 +200,7 @@ func (c Client) Update(collectionName string, selector map[string]interface{}, u
 
 	result, err := collection.UpdateMany(context.TODO(), selector, update)
 	if err != nil {
+		logger.Logger.Error("UpdateMany", zap.Error(err))
 		return nil, err
 	}
 
@@ -206,6 +214,7 @@ func (c Client) Upsert(collectionName string, selector map[string]interface{}, u
 
 	_, err := collection.UpdateMany(context.TODO(), selector, update, requestOptions)
 	if err != nil {
+		logger.Logger.Error("Upsert", zap.Error(err))
 		return err
 	}
 
@@ -218,10 +227,43 @@ func (c Client) Remove(collectionName string, selector map[string]interface{}) e
 
 	_, err := collection.DeleteMany(context.TODO(), selector)
 	if err != nil {
+		logger.Logger.Error("Remove", zap.Error(err))
 		return err
 	}
 
 	return nil
+}
+
+func (c Client) Aggregate(collectionName string, pipeline interface{}) (*types.FindResult, error) {
+	findResult := &types.FindResult{}
+	collection := c.GetCollection(collectionName)
+
+	cur, err := collection.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		logger.Logger.Error("Aggregate", zap.Error(err))
+		return nil, err
+	}
+
+	defer cur.Close(context.TODO())
+
+	for cur.Next(context.TODO()) {
+		var elem map[string]interface{}
+		decodeErr := cur.Decode(&elem)
+
+		if decodeErr != nil {
+			logger.Logger.Error("Aggregate", zap.Error(decodeErr))
+			return &types.FindResult{}, decodeErr
+		}
+
+		findResult.Result = append(findResult.Result, elem)
+	}
+
+	if cursorErr := cur.Err(); cursorErr != nil {
+		logger.Logger.Error("Aggregate", zap.Error(cursorErr))
+		return findResult, cursorErr
+	}
+
+	return findResult, nil
 }
 
 func (c Client) preprocessSelector(selector map[string]interface{}) map[string]interface{} {
@@ -230,7 +272,7 @@ func (c Client) preprocessSelector(selector map[string]interface{}) map[string]i
 		case string:
 			objID, err := primitive.ObjectIDFromHex(selector["_id"].(string))
 			if err != nil {
-				fmt.Println("Wrong objectId string")
+				logger.Logger.Error("preprocessSelector", zap.Error(err))
 				return selector
 			}
 			selector["_id"] = objID
@@ -249,14 +291,12 @@ func (c Client) preprocessSelector(selector map[string]interface{}) map[string]i
 					}
 					m[k] = objIDslice
 				default:
-					fmt.Printf("wrong type for preprocessSelector: %+v, type : %s", m, reflect.TypeOf(v))
 					return selector
 				}
 
 			}
 			selector["_id"] = m
 		default:
-			fmt.Printf("wrong type for preprocessSelector: %+v, type : %s", selector["_id"], reflect.TypeOf(selector["_id"]))
 			return selector
 		}
 	}
@@ -274,7 +314,7 @@ func (c Client) preprocessDoc(doc interface{}) primitive.M {
 		id := accessToken["_id"].(string)
 		objID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			fmt.Println("Preprocess doc - cant create objectID for access token")
+			logger.Logger.Error("preprocessDoc", zap.Error(err))
 			return nil
 		}
 		accessToken["_id"] = objID
