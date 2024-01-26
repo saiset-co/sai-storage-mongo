@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/saiset-co/saiStorageMongo/types"
 )
 
 type SaiStorage struct {
@@ -20,7 +18,7 @@ type SaiStorageResponse struct {
 	Count  int                      `json:"count"`
 }
 
-func (s *SaiStorage) Send(request types.IRequest) (*SaiStorageResponse, error) {
+func (s *SaiStorage) Send(request IRequest) (*SaiStorageResponse, error) {
 	// Define the request body
 	requestBody, err := json.Marshal(request)
 	if err != nil {
