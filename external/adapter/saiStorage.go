@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/saiset-co/saiStorage/types"
+	"github.com/saiset-co/saiStorageMongo/types"
 )
 
 type SaiStorage struct {

@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/saiset-co/saiService"
-	"github.com/saiset-co/saiStorage/internal"
-	"github.com/saiset-co/saiStorage/logger"
-	"github.com/saiset-co/saiStorage/mongo"
-	"github.com/saiset-co/saiStorage/types"
+	"github.com/saiset-co/saiStorageMongo/internal"
+	"github.com/saiset-co/saiStorageMongo/logger"
+	"github.com/saiset-co/saiStorageMongo/mongo"
+	"github.com/saiset-co/saiStorageMongo/types"
 )
 
 func main() {

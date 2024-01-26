@@ -7,10 +7,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/saiset-co/saiStorage/logger"
-	"github.com/saiset-co/saiStorage/mongo"
-	"github.com/saiset-co/saiStorage/types"
-	"github.com/saiset-co/saiStorage/utils"
+	"github.com/saiset-co/saiStorageMongo/logger"
+	"github.com/saiset-co/saiStorageMongo/mongo"
+	"github.com/saiset-co/saiStorageMongo/types"
+	"github.com/saiset-co/saiStorageMongo/utils"
 )
 
 const Update = "update"

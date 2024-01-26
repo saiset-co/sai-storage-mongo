@@ -8,9 +8,9 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/saiset-co/saiService"
-	"github.com/saiset-co/saiStorage/internal/actions"
-	"github.com/saiset-co/saiStorage/logger"
-	"github.com/saiset-co/saiStorage/types"
+	"github.com/saiset-co/saiStorageMongo/internal/actions"
+	"github.com/saiset-co/saiStorageMongo/logger"
+	"github.com/saiset-co/saiStorageMongo/types"
 )
 
 func (is InternalService) NewHandler() saiService.Handler {
