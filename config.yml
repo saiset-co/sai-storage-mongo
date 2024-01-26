@@ -1,0 +1,24 @@
+common:
+  version: "2.0"
+  socket:
+    enabled: false
+    port: 8882
+  http:
+    enabled: true
+    port: 8880
+  ws:
+    enabled: false
+    port: 8881
+storage:
+  atlas: ${ATLAS}
+  host: "${HOST}"
+  port: "${PORT}"
+  user: "${USER}"
+  pass: "${PASS}"
+  database: "${DB}"
+  connectionString: "${CONNECTION_STRING}"
+  duplicate: ${DUPLICATE}
+  duplicateURL: "${DUPLICATE_URL}"
+  duplicateTimeout: ${DUPLICATE_TIMEOUT}
+  duplicatePause: ${DUPLICATE_PAUSE}
+  duplicateMethod: "${DUPLICATE_METHOD}"
