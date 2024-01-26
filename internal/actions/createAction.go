@@ -8,9 +8,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
 
-	"github.com/saiset-co/saiStorageMongo/logger"
-	"github.com/saiset-co/saiStorageMongo/mongo"
-	"github.com/saiset-co/saiStorageMongo/types"
+	"github.com/saiset-co/sai-storage-mongo/logger"
+	"github.com/saiset-co/sai-storage-mongo/mongo"
+	"github.com/saiset-co/sai-storage-mongo/types"
 )
 
 const Create = "create"

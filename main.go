@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/saiset-co/sai-storage-mongo/internal"
+	"github.com/saiset-co/sai-storage-mongo/logger"
+	"github.com/saiset-co/sai-storage-mongo/mongo"
+	"github.com/saiset-co/sai-storage-mongo/types"
 	"github.com/saiset-co/saiService"
-	"github.com/saiset-co/saiStorageMongo/internal"
-	"github.com/saiset-co/saiStorageMongo/logger"
-	"github.com/saiset-co/saiStorageMongo/mongo"
-	"github.com/saiset-co/saiStorageMongo/types"
 )
 
 func main() {

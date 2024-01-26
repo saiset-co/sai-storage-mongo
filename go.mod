@@ -1,4 +1,4 @@
-module github.com/saiset-co/saiStorageMongo
+module github.com/saiset-co/sai-storage-mongo
 
 go 1.21.1
 
