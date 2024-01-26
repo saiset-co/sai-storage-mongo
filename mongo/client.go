@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 
-	"github.com/saiset-co/saiStorageMongo/logger"
-	"github.com/saiset-co/saiStorageMongo/types"
+	"github.com/saiset-co/sai-storage-mongo/logger"
+	"github.com/saiset-co/sai-storage-mongo/types"
 )
 
 type Client struct {

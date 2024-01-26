@@ -1,8 +1,8 @@
 package internal
 
 import (
+	"github.com/saiset-co/sai-storage-mongo/mongo"
 	"github.com/saiset-co/saiService"
-	"github.com/saiset-co/saiStorageMongo/mongo"
 )
 
 type InternalService struct {
