@@ -2,8 +2,10 @@ package mongo
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,6 +21,18 @@ type Client struct {
 	Host   *mongo.Client
 	Ctx    context.Context
 }
+
+type IndexElement struct {
+	Key   string      `json:"key"`
+	Value interface{} `json:"value"`
+}
+
+type IndexData struct {
+	Keys   []bson.M `bson:"keys" json:"keys"`
+	Unique bool     `bson:"unique" json:"unique"`
+}
+
+type IndexesData []IndexData
 
 func NewMongoClient(config *types.StorageConfig) (*Client, error) {
 	var host *mongo.Client
@@ -264,6 +278,91 @@ func (c Client) Aggregate(collectionName string, pipeline interface{}) (*types.F
 	}
 
 	return findResult, nil
+}
+
+func (c Client) CreateIndexes(collectionName string, data interface{}) ([]string, error) {
+	collection := c.GetCollection(collectionName)
+	var _data []IndexData
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		logger.Logger.Error("CreateIndexes", zap.Error(err))
+		return nil, err
+	}
+
+	err = json.Unmarshal(jsonData, &_data)
+	if err != nil {
+		logger.Logger.Error("CreateIndexes", zap.Error(err))
+		return nil, err
+	}
+
+	var indexes []mongo.IndexModel
+
+	for _, indexValue := range _data {
+		var keys []IndexElement
+
+		for _, v := range indexValue.Keys {
+			for _i, _v := range v {
+				value, ok := _v.(float64)
+				if !ok {
+					err = errors.New("index value not an integer")
+					logger.Logger.Error("CreateIndexes", zap.Error(err))
+					return nil, err
+				}
+				keys = append(keys, IndexElement{Key: _i, Value: value})
+			}
+		}
+
+		indexModel := mongo.IndexModel{
+			Keys: keys,
+		}
+
+		if indexValue.Unique {
+			indexModel.Options = options.Index().SetUnique(true)
+		}
+
+		indexes = append(indexes, indexModel)
+	}
+
+	result, err := collection.Indexes().CreateMany(context.TODO(), indexes)
+	if err != nil {
+		logger.Logger.Error("CreateIndexes", zap.Error(err))
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (c Client) GetIndexes(collectionName string) ([]interface{}, error) {
+	var result []interface{}
+	collection := c.GetCollection(collectionName)
+
+	cur, err := collection.Indexes().List(context.TODO())
+	if err != nil {
+		logger.Logger.Error("GetIndexes", zap.Error(err))
+		return result, err
+	}
+
+	defer cur.Close(context.TODO())
+
+	for cur.Next(context.TODO()) {
+		var index interface{}
+		decodeErr := cur.Decode(&index)
+
+		if decodeErr != nil {
+			return result, decodeErr
+		}
+
+		result = append(result, index)
+		break
+	}
+
+	if cursorErr := cur.Err(); cursorErr != nil {
+		logger.Logger.Error("GetIndexes", zap.Error(err))
+		return result, cursorErr
+	}
+
+	return result, nil
 }
 
 func (c Client) preprocessSelector(selector map[string]interface{}) map[string]interface{} {

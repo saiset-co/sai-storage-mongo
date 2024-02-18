@@ -87,6 +87,30 @@ func (is InternalService) NewHandler() service.Handler {
 				return actions.NewAggregateAction(is.Client).Handle(request)
 			},
 		},
+		"create_indexes": service.HandlerElement{
+			Name:        "Create indexes",
+			Description: "Create indexes",
+			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				request, err := is.convertRequest(data, "create_indexes")
+				if err != nil {
+					return nil, 500, err
+				}
+
+				return actions.NewCreateIndexesAction(is.Client).Handle(request)
+			},
+		},
+		"get_indexes": service.HandlerElement{
+			Name:        "Get indexes",
+			Description: "Get indexes",
+			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				request, err := is.convertRequest(data, "get_indexes")
+				if err != nil {
+					return nil, 500, err
+				}
+
+				return actions.NewGetIndexesAction(is.Client).Handle(request)
+			},
+		},
 	}
 }
 
@@ -215,6 +239,48 @@ func (is InternalService) convertRequest(data interface{}, requestType string) (
 		if err != nil {
 			logger.Logger.Error("convertRequest", zap.Error(err))
 			return nil, errors.Wrap(err, "convertRequest - validation - aggregate")
+		}
+
+		return request, nil
+	case "create_indexes":
+		request := types.CreateIndexesRequest{}
+		dataJson, err := json.Marshal(data)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - marshaling - create_indexes")
+		}
+
+		err = json.Unmarshal(dataJson, &request)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - unmarshaling - create_indexes")
+		}
+
+		err = validator.New().Struct(request)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - validation - create_indexes")
+		}
+
+		return request, nil
+	case "get_indexes":
+		request := types.GetIndexesRequest{}
+		dataJson, err := json.Marshal(data)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - marshaling - get_indexes")
+		}
+
+		err = json.Unmarshal(dataJson, &request)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - unmarshaling - get_indexes")
+		}
+
+		err = validator.New().Struct(request)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - validation - get_indexes")
 		}
 
 		return request, nil
