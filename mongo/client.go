@@ -22,8 +22,8 @@ type Client struct {
 }
 
 type IndexElement struct {
-	Key   string      `json:"key"`
-	Value interface{} `json:"value"`
+	Key   string      `json:"key" bson:"key"`
+	Value interface{} `json:"value" bson:"value"`
 }
 
 type IndexData struct {
@@ -306,8 +306,22 @@ func (c Client) CreateIndexes(collectionName string, data interface{}) ([]string
 			}
 		}
 
+		var keysData []bson.D
+
+		keysBytes, err := bson.Marshal(keys)
+		if err != nil {
+			logger.Logger.Error("CreateIndexes - marshal", zap.Error(err))
+			return nil, err
+		}
+
+		err = bson.Unmarshal(keysBytes, &keysData)
+		if err != nil {
+			logger.Logger.Error("CreateIndexes - unmarshal", zap.Error(err))
+			return nil, err
+		}
+
 		indexModel := mongo.IndexModel{
-			Keys: keys,
+			Keys: keysData,
 		}
 
 		if indexValue.Unique {
