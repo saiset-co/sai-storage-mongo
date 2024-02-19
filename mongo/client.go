@@ -298,30 +298,19 @@ func (c Client) CreateIndexes(collectionName string, data interface{}) ([]string
 	var indexes []mongo.IndexModel
 
 	for _, indexValue := range _data {
-		var keys []IndexElement
+		doc := bson.D{}
 
 		for _, v := range indexValue.Keys {
 			for _i, _v := range v {
-				keys = append(keys, IndexElement{Key: _i, Value: _v})
+				doc = append(doc, bson.E{
+					Key:   _i,
+					Value: _v,
+				})
 			}
 		}
 
-		var keysData []bson.D
-
-		keysBytes, err := bson.Marshal(keys)
-		if err != nil {
-			logger.Logger.Error("CreateIndexes - marshal", zap.Error(err))
-			return nil, err
-		}
-
-		err = bson.Unmarshal(keysBytes, &keysData)
-		if err != nil {
-			logger.Logger.Error("CreateIndexes - unmarshal", zap.Error(err))
-			return nil, err
-		}
-
 		indexModel := mongo.IndexModel{
-			Keys: keysData,
+			Keys: doc,
 		}
 
 		if indexValue.Unique {
