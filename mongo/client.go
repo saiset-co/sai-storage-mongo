@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -303,13 +302,7 @@ func (c Client) CreateIndexes(collectionName string, data interface{}) ([]string
 
 		for _, v := range indexValue.Keys {
 			for _i, _v := range v {
-				value, ok := _v.(float64)
-				if !ok {
-					err = errors.New("index value not an integer")
-					logger.Logger.Error("CreateIndexes", zap.Error(err))
-					return nil, err
-				}
-				keys = append(keys, IndexElement{Key: _i, Value: value})
+				keys = append(keys, IndexElement{Key: _i, Value: _v})
 			}
 		}
 
