@@ -52,6 +52,10 @@ type GetIndexesRequest struct {
 	Collection string `json:"collection" validate:"required"`
 }
 
+type DropIndexesRequest struct {
+	Collection string `json:"collection" validate:"required"`
+}
+
 type DeleteRequest struct {
 	Collection string                 `json:"collection" validate:"required"`
 	Select     map[string]interface{} `json:"select,omitempty" validate:"required"`
@@ -214,5 +218,25 @@ func (r GetIndexesRequest) GetOptions() *Options {
 }
 
 func (r GetIndexesRequest) GetIncludeFields() []string {
+	return nil
+}
+
+func (r DropIndexesRequest) GetCollection() string {
+	return r.Collection
+}
+
+func (r DropIndexesRequest) GetSelect() map[string]interface{} {
+	return nil
+}
+
+func (r DropIndexesRequest) GetData() interface{} {
+	return nil
+}
+
+func (r DropIndexesRequest) GetOptions() *Options {
+	return nil
+}
+
+func (r DropIndexesRequest) GetIncludeFields() []string {
 	return nil
 }

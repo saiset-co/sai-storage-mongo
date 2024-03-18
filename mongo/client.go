@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -302,9 +303,14 @@ func (c Client) CreateIndexes(collectionName string, data interface{}) ([]string
 
 		for _, v := range indexValue.Keys {
 			for _i, _v := range v {
+				value, ok := _v.(float64)
+				if !ok {
+					return nil, errors.New("index value not an integer")
+				}
+
 				doc = append(doc, bson.E{
 					Key:   _i,
-					Value: _v,
+					Value: int64(value),
 				})
 			}
 		}
@@ -356,6 +362,19 @@ func (c Client) GetIndexes(collectionName string) ([]interface{}, error) {
 	if cursorErr := cur.Err(); cursorErr != nil {
 		logger.Logger.Error("GetIndexes", zap.Error(err))
 		return result, cursorErr
+	}
+
+	return result, nil
+}
+
+func (c Client) DropIndexes(collectionName string) ([]interface{}, error) {
+	var result []interface{}
+	collection := c.GetCollection(collectionName)
+
+	_, err := collection.Indexes().DropAll(context.TODO())
+	if err != nil {
+		logger.Logger.Error("DropIndexes", zap.Error(err))
+		return result, err
 	}
 
 	return result, nil
