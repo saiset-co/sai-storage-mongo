@@ -111,6 +111,18 @@ func (is InternalService) NewHandler() service.Handler {
 				return actions.NewGetIndexesAction(is.Client).Handle(request)
 			},
 		},
+		"drop_indexes": service.HandlerElement{
+			Name:        "Drop indexes",
+			Description: "Drop indexes",
+			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				request, err := is.convertRequest(data, "drop_indexes")
+				if err != nil {
+					return nil, 500, err
+				}
+
+				return actions.NewDropIndexesAction(is.Client).Handle(request)
+			},
+		},
 	}
 }
 
@@ -281,6 +293,27 @@ func (is InternalService) convertRequest(data interface{}, requestType string) (
 		if err != nil {
 			logger.Logger.Error("convertRequest", zap.Error(err))
 			return nil, errors.Wrap(err, "convertRequest - validation - get_indexes")
+		}
+
+		return request, nil
+	case "drop_indexes":
+		request := types.DropIndexesRequest{}
+		dataJson, err := json.Marshal(data)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - marshaling - drop_indexes")
+		}
+
+		err = json.Unmarshal(dataJson, &request)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - unmarshaling - drop_indexes")
+		}
+
+		err = validator.New().Struct(request)
+		if err != nil {
+			logger.Logger.Error("convertRequest", zap.Error(err))
+			return nil, errors.Wrap(err, "convertRequest - validation - drop_indexes")
 		}
 
 		return request, nil
