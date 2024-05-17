@@ -404,6 +404,14 @@ func (c Client) preprocessSelector(selector map[string]interface{}) map[string]i
 						objIDslice = append(objIDslice, objID)
 					}
 					m[k] = objIDslice
+				case string:
+					objID, err := primitive.ObjectIDFromHex(v.(string))
+					if err != nil {
+						logger.Logger.Error("preprocessSelector->primitive.ObjectIDFromHex", zap.Error(err))
+						continue
+					}
+
+					m[k] = objID
 				default:
 					return selector
 				}
