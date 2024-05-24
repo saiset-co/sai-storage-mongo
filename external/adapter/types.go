@@ -141,8 +141,8 @@ func (r UpsertRequest) GetSelect() map[string]interface{} {
 	return r.Select
 }
 
-func (r UpsertRequest) GetData() interface{} {
-	return r.Document
+func (r UpsertRequest) GetData() []interface{} {
+	return []interface{}{r.Document}
 }
 
 func (r UpsertRequest) GetOptions() *Options {

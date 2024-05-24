@@ -23,7 +23,7 @@ func NewDeleteAction(client *mongo.Client) *DeleteAction {
 }
 
 func (action *DeleteAction) Handle(request types.IRequest) (interface{}, int, error) {
-	err := action.Client.Remove(request.GetCollection(), request.GetSelect())
+	deleteResults, err := action.Client.Remove(request.GetCollection(), request.GetSelect())
 	if err != nil {
 		logger.Logger.Error("DeleteAction", zap.Error(err))
 		return nil, http.StatusInternalServerError, err
@@ -31,5 +31,5 @@ func (action *DeleteAction) Handle(request types.IRequest) (interface{}, int, er
 
 	action.Client.Duplicate(Delete, request, []interface{}{})
 
-	return "Documents have been deleted", http.StatusOK, nil
+	return deleteResults, http.StatusOK, nil
 }
