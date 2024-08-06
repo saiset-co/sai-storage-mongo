@@ -8,7 +8,7 @@ type IWrapperRequest interface {
 type IRequest interface {
 	GetCollection() string
 	GetSelect() map[string]interface{}
-	GetData() []interface{}
+	GetData() interface{}
 	GetOptions() *Options
 	GetIncludeFields() []string
 }
@@ -81,7 +81,7 @@ func (r ReadRequest) GetSelect() map[string]interface{} {
 	return r.Select
 }
 
-func (r ReadRequest) GetData() []interface{} {
+func (r ReadRequest) GetData() interface{} {
 	return nil
 }
 
@@ -101,7 +101,7 @@ func (r CreateRequest) GetSelect() map[string]interface{} {
 	return nil
 }
 
-func (r CreateRequest) GetData() []interface{} {
+func (r CreateRequest) GetData() interface{} {
 	return r.Documents
 }
 
@@ -121,8 +121,8 @@ func (r UpdateRequest) GetSelect() map[string]interface{} {
 	return r.Select
 }
 
-func (r UpdateRequest) GetData() []interface{} {
-	return []interface{}{r.Document}
+func (r UpdateRequest) GetData() interface{} {
+	return r.Document
 }
 
 func (r UpdateRequest) GetOptions() *Options {
@@ -181,7 +181,7 @@ func (r DeleteRequest) GetSelect() map[string]interface{} {
 	return r.Select
 }
 
-func (r DeleteRequest) GetData() []interface{} {
+func (r DeleteRequest) GetData() interface{} {
 	return nil
 }
 
