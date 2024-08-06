@@ -50,7 +50,7 @@ func (action *UpsertAction) Handle(request types.IRequest) (interface{}, int, er
 			return nil, http.StatusInternalServerError, err
 		}
 
-		_, err = action.Client.Update(request.GetCollection(), request.GetSelect(), precessed)
+		_, err = action.Client.Update(request.GetCollection(), request.GetSelect(), map[string]interface{}{"$set": precessed})
 		if err != nil {
 			logger.Logger.Error("UpsertAction", zap.Error(err))
 			return nil, http.StatusInternalServerError, err
