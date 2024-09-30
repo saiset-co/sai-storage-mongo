@@ -7,6 +7,7 @@ import (
 
 type InternalService struct {
 	Name    string
+	Token   string
 	Context *service.Context
 	Client  *mongo.Client
 }
