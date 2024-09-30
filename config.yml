@@ -1,11 +1,12 @@
 common:
-  version: "2.0"
+  version: "2.1"
   socket:
     enabled: false
     port: 8882
   http:
     enabled: true
     port: 8880
+    token: "12345"
   ws:
     enabled: false
     port: 8881

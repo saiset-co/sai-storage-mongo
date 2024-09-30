@@ -19,6 +19,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Create documents",
 			Description: "Create documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "create")
 				if err != nil {
 					return nil, 500, err
@@ -31,6 +35,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Read documents",
 			Description: "Read documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "read")
 				if err != nil {
 					return nil, 500, err
@@ -43,6 +51,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Update documents",
 			Description: "Update documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "update")
 				if err != nil {
 					return nil, 500, err
@@ -55,6 +67,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Upsert documents",
 			Description: "Upsert documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "upsert")
 				if err != nil {
 					return nil, 500, err
@@ -67,6 +83,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Delete documents",
 			Description: "Delete documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "delete")
 				if err != nil {
 					return nil, 500, err
@@ -79,6 +99,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Aggregate documents",
 			Description: "Aggregate documents",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "aggregate")
 				if err != nil {
 					return nil, 500, err
@@ -91,6 +115,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Create indexes",
 			Description: "Create indexes",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "create_indexes")
 				if err != nil {
 					return nil, 500, err
@@ -103,6 +131,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Get indexes",
 			Description: "Get indexes",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "get_indexes")
 				if err != nil {
 					return nil, 500, err
@@ -115,6 +147,10 @@ func (is InternalService) NewHandler() service.Handler {
 			Name:        "Drop indexes",
 			Description: "Drop indexes",
 			Function: func(data interface{}, metadata interface{}) (interface{}, int, error) {
+				if !is.checkAccess(metadata) {
+					return nil, 400, errors.New("wrong token")
+				}
+
 				request, err := is.convertRequest(data, "drop_indexes")
 				if err != nil {
 					return nil, 500, err
@@ -411,4 +447,20 @@ func (is InternalService) convertData(data interface{}, requestType string) (typ
 	}
 
 	return nil, errors.Wrap(errors.New("no variable type"), "convertRequest")
+}
+
+func (is InternalService) checkAccess(metadata interface{}) bool {
+	meta, ok := metadata.(map[string]interface{})
+	if !ok {
+		logger.Logger.Error("ccess", zap.Error(errors.New("wrong metadata format")))
+		return false
+	}
+
+	token, ok := meta["token"].(string)
+	if !ok {
+		logger.Logger.Error("ccess", zap.Error(errors.New("wrong token format")))
+		return false
+	}
+
+	return token == is.Token
 }

@@ -31,5 +31,5 @@ func (action *DeleteAction) Handle(request types.IRequest) (interface{}, int, er
 
 	action.Client.Duplicate(Delete, request, []interface{}{})
 
-	return "Documents have been deleted", http.StatusOK, nil
+	return map[string]interface{}{}, http.StatusOK, nil
 }

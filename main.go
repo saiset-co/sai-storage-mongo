@@ -34,6 +34,7 @@ func main() {
 
 	is := internal.InternalService{
 		Name:    name,
+		Token:   svc.GetConfig("common.http.token", "").(string),
 		Context: svc.Context,
 		Client:  client,
 	}
