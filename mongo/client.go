@@ -235,17 +235,21 @@ func (c Client) Upsert(collectionName string, selector map[string]interface{}, u
 	return nil
 }
 
-func (c Client) Remove(collectionName string, selector map[string]interface{}) error {
+func (c Client) Remove(collectionName string, selector map[string]interface{}) (*types.DeleteResult, error) {
 	collection := c.GetCollection(collectionName)
 	selector = c.preprocessSelector(selector)
 
-	_, err := collection.DeleteMany(context.TODO(), selector)
+	result, err := collection.DeleteMany(context.TODO(), selector)
 	if err != nil {
 		logger.Logger.Error("Remove", zap.Error(err))
-		return err
+		return nil, err
 	}
 
-	return nil
+	delResult := &types.DeleteResult{
+		Count: result.DeletedCount,
+	}
+
+	return delResult, nil
 }
 
 func (c Client) Aggregate(collectionName string, pipeline interface{}) (*types.FindResult, error) {
@@ -404,6 +408,19 @@ func (c Client) preprocessSelector(selector map[string]interface{}) map[string]i
 						objIDslice = append(objIDslice, objID)
 					}
 					m[k] = objIDslice
+				case string:
+					idTmp := v.(string)
+					if len(idTmp) == 0 {
+						m[k] = primitive.NilObjectID
+					} else {
+						objID, err := primitive.ObjectIDFromHex(v.(string))
+						if err != nil {
+							logger.Logger.Error("preprocessSelector->primitive.ObjectIDFromHex", zap.Error(err))
+							continue
+						}
+
+						m[k] = objID
+					}
 				default:
 					return selector
 				}

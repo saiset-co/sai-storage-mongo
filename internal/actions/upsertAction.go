@@ -99,13 +99,24 @@ func (action *UpsertAction) Handle(request types.IRequest) (interface{}, int, er
 	}
 }
 
+
 func (action *UpsertAction) processUpdate(data interface{}) (interface{}, error) {
-	if itemData, ok := data.(map[string]interface{}); ok {
-		itemData["ch_time"] = time.Now().Unix()
-		data = itemData
+	itemData, ok := data.(map[string]interface{})
+	if !ok {
+		return data, nil
 	}
 
-	return data, nil
+	setData, ok := itemData["$set"].(map[string]interface{})
+	if !ok {
+		return data, nil
+	}
+
+	setData["ch_time"] = time.Now().Unix()
+
+	return map[string]interface{}{
+		"$set": setData,
+	}, nil
+
 }
 
 func (action *UpsertAction) processInsert(data interface{}) (interface{}, error) {
@@ -118,6 +129,8 @@ func (action *UpsertAction) processInsert(data interface{}) (interface{}, error)
 		itemData["internal_id"] = id
 		itemData["cr_time"] = time.Now().Unix()
 		itemData["ch_time"] = time.Now().Unix()
+
+		delete(itemData, "$set")
 
 		data = itemData
 	}
