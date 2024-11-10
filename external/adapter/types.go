@@ -13,9 +13,14 @@ type IRequest interface {
 	GetIncludeFields() []string
 }
 
+type Metadata struct {
+	Token string `json:"token"`
+}
+
 type Request struct {
-	Method string   `json:"method"`
-	Data   IRequest `json:"data"`
+	Method   string   `json:"method"`
+	Data     IRequest `json:"data"`
+	Metadata Metadata `json:"metadata"`
 }
 
 type Options struct {
