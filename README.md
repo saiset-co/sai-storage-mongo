@@ -62,7 +62,7 @@ curl --request GET \
 	"data": {
 		"collection": "CollectionName",
 		"select":{} //<-mongo select request format,
-		"document": {}, //<- struct to save in a DB
+		"document": {}, //<- struct to save in a DB Example: "document": { "$set" : {"field":"value"}  }
 	}
 }'
 ```
