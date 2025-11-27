@@ -78,6 +78,19 @@ type DeleteRequest struct {
 	Select     map[string]interface{} `json:"select,omitempty" validate:"required"`
 }
 
+type CreateIndexesRequest struct {
+	Collection string        `json:"collection" validate:"required"`
+	Data       []interface{} `json:"index_data,omitempty" validate:"required"`
+}
+
+type GetIndexesRequest struct {
+	Collection string `json:"collection" validate:"required"`
+}
+
+type DropIndexesRequest struct {
+	Collection string `json:"collection" validate:"required"`
+}
+
 func (r ReadRequest) GetCollection() string {
 	return r.Collection
 }
@@ -195,5 +208,65 @@ func (r DeleteRequest) GetOptions() *Options {
 }
 
 func (r DeleteRequest) GetIncludeFields() []string {
+	return nil
+}
+
+func (r CreateIndexesRequest) GetCollection() string {
+	return r.Collection
+}
+
+func (r CreateIndexesRequest) GetSelect() map[string]interface{} {
+	return nil
+}
+
+func (r CreateIndexesRequest) GetData() interface{} {
+	return r.Data
+}
+
+func (r CreateIndexesRequest) GetOptions() *Options {
+	return nil
+}
+
+func (r CreateIndexesRequest) GetIncludeFields() []string {
+	return nil
+}
+
+func (r GetIndexesRequest) GetCollection() string {
+	return r.Collection
+}
+
+func (r GetIndexesRequest) GetSelect() map[string]interface{} {
+	return nil
+}
+
+func (r GetIndexesRequest) GetData() interface{} {
+	return nil
+}
+
+func (r GetIndexesRequest) GetOptions() *Options {
+	return nil
+}
+
+func (r GetIndexesRequest) GetIncludeFields() []string {
+	return nil
+}
+
+func (r DropIndexesRequest) GetCollection() string {
+	return r.Collection
+}
+
+func (r DropIndexesRequest) GetSelect() map[string]interface{} {
+	return nil
+}
+
+func (r DropIndexesRequest) GetData() interface{} {
+	return nil
+}
+
+func (r DropIndexesRequest) GetOptions() *Options {
+	return nil
+}
+
+func (r DropIndexesRequest) GetIncludeFields() []string {
 	return nil
 }
